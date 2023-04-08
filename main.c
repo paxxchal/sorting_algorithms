@@ -1,109 +1,56 @@
-#include "deck.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "sort.h"
 
-void print_deck(const deck_node_t *deck)
+/**
+ * create_listint - Creates a doubly linked list from an array of integers
+ *
+ * @array: Array to convert to a doubly linked list
+ * @size: Size of the array
+ *
+ * Return: Pointer to the first element of the created list. NULL on failure
+ */
+listint_t *create_listint(const int *array, size_t size)
 {
-        size_t i;
-        char kinds[4] = {'S', 'H', 'C', 'D'};
+        listint_t *list;
+        listint_t *node;
+        int *tmp;
 
-        i = 0;
-        while (deck)
-        {
-                if (i)
-                        printf(", ");
-                printf("{%s, %c}", deck->card->value, kinds[deck->card->kind]);
-                if (i == 12)
-                        printf("\n");
-                i = (i + 1) % 13;
-                deck = deck->next;
-        }
-}
-
-deck_node_t *init_deck(const card_t cards[52])
-{
-        deck_node_t *deck;
-        deck_node_t *node;
-        size_t i;
-
-        i = 52;
-        deck = NULL;
-        while (i--)
+        list = NULL;
+        while (size--)
         {
                 node = malloc(sizeof(*node));
                 if (!node)
                         return (NULL);
-                node->card = &cards[i];
-                node->next = deck;
+                tmp = (int *)&node->n;
+                *tmp = array[size];
+                node->next = list;
                 node->prev = NULL;
-                if (deck)
-                        deck->prev = node;
-                deck = node;
+                list = node;
+                if (list->next)
+                        list->next->prev = list;
         }
-        return (deck);
+        return (list);
 }
 
+/**
+ * main - Entry point
+ *
+ * Return: Always 0
+ */
 int main(void)
 {
-        card_t cards[52] = {
-            {"Jack", CLUB},
-            {"4", HEART},
-            {"3", HEART},
-            {"3", DIAMOND},
-            {"Queen", HEART},
-            {"5", HEART},
-            {"5", SPADE},
-            {"10", HEART},
-            {"6", HEART},
-            {"5", DIAMOND},
-            {"6", SPADE},
-            {"9", HEART},
-            {"7", DIAMOND},
-            {"Jack", SPADE},
-            {"Ace", DIAMOND},
-            {"9", CLUB},
-            {"Jack", DIAMOND},
-            {"7", SPADE},
-            {"King", DIAMOND},
-            {"10", CLUB},
-            {"King", SPADE},
-            {"8", CLUB},
-            {"9", SPADE},
-            {"6", CLUB},
-            {"Ace", CLUB},
-            {"3", SPADE},
-            {"8", SPADE},
-            {"9", DIAMOND},
-            {"2", HEART},
-            {"4", DIAMOND},
-            {"6", DIAMOND},
-            {"3", CLUB},
-            {"Queen", CLUB},
-            {"10", SPADE},
-            {"8", DIAMOND},
-            {"8", HEART},
-            {"Ace", SPADE},
-            {"Jack", HEART},
-            {"2", CLUB},
-            {"4", SPADE},
-            {"2", SPADE},
-            {"2", DIAMOND},
-            {"King", CLUB},
-            {"Queen", SPADE},
-            {"Queen", DIAMOND},
-            {"7", CLUB},
-            {"7", HEART},
-            {"5", CLUB},
-            {"10", DIAMOND},
-            {"4", CLUB},
-            {"King", HEART},
-            {"Ace", HEART},
-        };
-        deck_node_t *deck;
+        listint_t *list;
+        int array[] = {19, 48, 99, 71, 13, 52, 96, 73, 86, 7};
+        size_t n = sizeof(array) / sizeof(array[0]);
 
-        deck = init_deck(cards);
-        print_deck(deck);
+        list = create_listint(array, n);
+        if (!list)
+                return (1);
+        print_list(list);
         printf("\n");
-        sort_deck(&deck);
+        insertion_sort_list(&list);
         printf("\n");
-        print_deck(deck);
+        print_list(list);
         return (0);
 }
